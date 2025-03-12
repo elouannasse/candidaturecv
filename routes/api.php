@@ -1,12 +1,22 @@
 <?php
 
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\OffreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
 
-Route::apiResource('offres',OffreController::class);
+// Route::apiResource('offres',OffreController::class);
+
+
+Route::post('/auth/register',[UserController::class,'createUser']);
+Route::post('/auth/login',[UserController::class,'loginUser']);
+
+Route::middleware('auth:sanctum')->post('/offres/{offre_id}/apply', [OffreController::class, 'apply']);
+
+Route::middleware('auth:sanctum')->post('/auth/updateProfile', [UserController::class, 'updateProfile']);
+
+
+
+Route::apiResource('/offres',OffreController::class);

@@ -11,4 +11,8 @@ class Offre extends Model
     use HasFactory;
 
     protected $fillable=['title','content','lieu'];
+
+    public function users(){
+        return $this->belongsToMany(User::class,'user_offre');
+    }
 }
