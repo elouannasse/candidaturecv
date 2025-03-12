@@ -117,13 +117,15 @@ class OffreController extends Controller
         ],201);
     }
 
-    // public function userApplications(){
+    public function userApplications(){
 
-    //     $user=auth()->user();
-    //     $applications=$user->offres()->get();
-    //     return response()->json($applications);
+    $user = auth()->user();
+    
+    $applications = $user->offres()->get();
+    
+    return response()->json($applications);
 
-    // }
+    }
 
 
 

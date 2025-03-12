@@ -138,4 +138,14 @@ class UserController extends Controller
     }
 }
 
+// app/Http/Controllers/UserController.php
+public function userApplications()
+{
+    $user = auth()->user();
+    $applications = $user->offres()->get();  
+    return response()->json($applications);
+}
+
+
+
 }
