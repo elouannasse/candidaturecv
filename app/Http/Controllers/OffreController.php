@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class OffreController extends Controller
 {
@@ -41,6 +43,7 @@ class OffreController extends Controller
             'title' => $request->title,
             'lieu' => $request->lieu,
             'content' => $request->content,
+            'email' => $request->email,
         ];
 
         DB::beginTransaction();
@@ -107,9 +110,14 @@ class OffreController extends Controller
 
         // $user=Auth::user();
         $user=auth()->user();
+        $offre = Offre::findOrFail($offre_id);
 
 
         $user->offres()->attach($offre_id,['cv'=>$request->cv]);
+
+        $this->sendEmailNotification($offre->email, $user, $request->cv);
+
+
 
         return response()->json([
             'message'=>'submitted successfully',
@@ -117,15 +125,36 @@ class OffreController extends Controller
         ],201);
     }
 
-    public function userApplications(){
 
-    $user = auth()->user();
-    
-    $applications = $user->offres()->get();
-    
-    return response()->json($applications);
+    private function sendEmailNotification($offreEmail, $user, $cvContent)
+{
 
-    }
+    $mail = new PHPMailer(true);
+
+    try {
+
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = config('mail.mailers.smtp.username');
+        $mail->Password = 'dhva riqj jhsa zwem';
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port = 465;
+
+        $mail->setFrom(config('mail.mailers.smtp.username'), 'healthCare ');
+        $mail->addAddress($offreEmail); 
+
+        $mail->isHTML(true);
+        $mail->Subject = 'New Job ' . $user->name;
+        $mail->Body    = "<h3>New Application Received</h3>
+                          <p><strong>Applicant Name:</strong> {$user->name}</p>
+                          <p><strong>Email:</strong> {$user->email}</p>
+                          <p><strong>CV Content:</strong> {$cvContent}</p>";
+
+        $mail->send();
+    } catch (Exception $e) {
+        dd('Email could not be sent. Mailer Error: ');    }
+}
 
 
 

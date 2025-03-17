@@ -18,6 +18,7 @@ class OffreResource extends JsonResource
             'title'=>$this->title,
             'lieu'=>$this->lieu,
             'content'=>$this->content,
+            'email'=>$this->email,
         ];
     }
 }
