@@ -36,7 +36,10 @@ Route::middleware([JwtMiddleware::class])->group(function () {
 
 // JWT ------------------------------------
 
-Route::apiResource('/offres', OffreController::class);
-Route::post('/offres/{offre_id}/apply', [OffreController::class, 'apply']);
+Route::middleware(JwtMiddleware::class)->group(function(){
+    Route::apiResource('/offres', OffreController::class);
 
+});
+
+Route::post('/offres/{offre_id}/apply', [OffreController::class, 'apply']);
 Route::get('/user/applications', [UserController::class, 'userApplications']);

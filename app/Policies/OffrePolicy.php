@@ -29,7 +29,7 @@ class OffrePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->role_id === 2; // recruteur role
     }
 
     /**
@@ -37,7 +37,7 @@ class OffrePolicy
      */
     public function update(User $user, Offre $offre): bool
     {
-        return false;
+        return $user->role_id === 2; // recruteur
     }
 
     /**
@@ -45,7 +45,7 @@ class OffrePolicy
      */
     public function delete(User $user, Offre $offre): bool
     {
-        return false;
+        return $user->role_id === 2; // recruteur 
     }
 
     /**

@@ -16,9 +16,12 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class OffreController extends Controller
 {
+    use AuthorizesRequests; // Use the trait in the class
+
 
 
     private OffreRepositoryInterface $offreRepositoryInterface;
@@ -38,6 +41,7 @@ class OffreController extends Controller
 
     public function store(StoreOffreRequest $request)
     {
+        $this->authorize('create', Offre::class);
 
         $details = [
             'title' => $request->title,
@@ -68,10 +72,14 @@ class OffreController extends Controller
 
     public function update(UpdateOffreRequest $request, $id)
     {
+        $offre = $this->offreRepositoryInterface->getById($id);
+        $this->authorize('update', $offre);
+
         $updateDetails = [
             'title' => $request->title,
             'lieu' => $request->lieu,
             'content' => $request->content,
+            'email' => $request->email,
         ];
 
         DB::beginTransaction();
@@ -89,6 +97,8 @@ class OffreController extends Controller
 
     public function destroy($id)
     {
+        $offre = $this->offreRepositoryInterface->getById($id);
+        $this->authorize('delete', $offre);
         try {
             $offre = $this->offreRepositoryInterface->getById($id);
             $this->offreRepositoryInterface->delete($id);
@@ -101,29 +111,30 @@ class OffreController extends Controller
 
 
 
-    public function apply(Request $request, $offre_id)
-    {
+    // public function apply(Request $request, $offre_id)
+    // {
 
-        $request->validate([
-            'cv' => 'required'
-        ]);
+    //     $request->validate([
+    //         'cv' => 'required'
+    //     ]);
 
-        // $user=Auth::user();
-        $user=auth()->user();
-        $offre = Offre::findOrFail($offre_id);
-
-
-        $user->offres()->attach($offre_id,['cv'=>$request->cv]);
-
-        $this->sendEmailNotification($offre->email, $user, $request->cv);
+    //     $user=auth()->user();
+    //     $offre = Offre::findOrFail($offre_id);
 
 
+    //     $user->offres()->attach($offre_id,['cv'=>$request->cv]);
 
-        return response()->json([
-            'message'=>'submitted successfully',
-            'cv'=>$request->cv
-        ],201);
-    }
+    //     $this->sendEmailNotification($offre->email, $user, $request->cv);
+
+
+
+    //     return response()->json([
+    //         'message'=>'submitted successfully',
+    //         'cv'=>$request->cv
+    //     ],201);
+    // }
+
+
 
 
     private function sendEmailNotification($offreEmail, $user, $cvContent)
@@ -142,7 +153,7 @@ class OffreController extends Controller
         $mail->Port = 465;
 
         $mail->setFrom(config('mail.mailers.smtp.username'), 'healthCare ');
-        $mail->addAddress($offreEmail); 
+        $mail->addAddress($offreEmail);
 
         $mail->isHTML(true);
         $mail->Subject = 'New Job ' . $user->name;

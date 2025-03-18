@@ -27,6 +27,7 @@ class UpdateOffreRequest extends FormRequest
             'title'=>'required',
             'lieu'=>'required',
             'content'=>'required',
+            'email'=>'required',
         ];
     }
 

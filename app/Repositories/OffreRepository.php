@@ -19,17 +19,18 @@ class OffreRepository implements OffreRepositoryInterface
      public function getById($id){
         return Offre::findOrFail($id);
      }
- 
+
      public function store(array $data){
         return Offre::create($data);
      }
- 
+
      public function update(array $data,$id){
-        return Offre::whereId($id)->update($data);
+         Offre::whereId($id)->update($data);
+        return $this->getById($id);
      }
-     
+
      public function delete($id){
         Offre::destroy($id);
      }
-    
+
 }
