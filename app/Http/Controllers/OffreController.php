@@ -20,7 +20,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class OffreController extends Controller
 {
-    use AuthorizesRequests; // Use the trait in the class
+    use AuthorizesRequests;
 
 
 
@@ -48,19 +48,20 @@ class OffreController extends Controller
             'lieu' => $request->lieu,
             'content' => $request->content,
             'email' => $request->email,
+            'recruter_id'=>Auth::id()
+
         ];
 
         DB::beginTransaction();
         try {
-
             $offre = $this->offreRepositoryInterface->store($details);
             DB::commit();
             return ApiResponseClass::sendResponse(new OffreResource($offre), 'offre create succefully', 201);
         } catch (\Throwable $th) {
-
             return ApiResponseClass::rollback($th);
         }
     }
+
 
     public function show($id)
     {
@@ -111,61 +112,62 @@ class OffreController extends Controller
 
 
 
-    // public function apply(Request $request, $offre_id)
-    // {
+    public function apply(Request $request, $offre_id)
+    {
 
-    //     $request->validate([
-    //         'cv' => 'required'
-    //     ]);
+        $request->validate([
+            'cv' => 'required'
+        ]);
 
-    //     $user=auth()->user();
-    //     $offre = Offre::findOrFail($offre_id);
-
-
-    //     $user->offres()->attach($offre_id,['cv'=>$request->cv]);
-
-    //     $this->sendEmailNotification($offre->email, $user, $request->cv);
+        $user = auth()->user();
+        $offre = Offre::findOrFail($offre_id);
 
 
+        $user->offres()->attach($offre_id, ['cv' => $request->cv]);
 
-    //     return response()->json([
-    //         'message'=>'submitted successfully',
-    //         'cv'=>$request->cv
-    //     ],201);
-    // }
+        $this->sendEmailNotification($offre->email, $user, $request->cv);
+
+
+
+        return response()->json([
+            'message' => 'submitted successfully',
+            'cv' => $request->cv
+        ], 201);
+    }
 
 
 
 
     private function sendEmailNotification($offreEmail, $user, $cvContent)
-{
+    {
 
-    $mail = new PHPMailer(true);
+        $mail = new PHPMailer(true);
 
-    try {
+        try {
 
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = config('mail.mailers.smtp.username');
-        $mail->Password = 'dhva riqj jhsa zwem';
-        $mail->SMTPSecure = 'ssl';
-        $mail->Port = 465;
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = config('mail.mailers.smtp.username');
+            $mail->Password = 'dhva riqj jhsa zwem';
+            $mail->SMTPSecure = 'ssl';
+            $mail->Port = 465;
 
-        $mail->setFrom(config('mail.mailers.smtp.username'), 'healthCare ');
-        $mail->addAddress($offreEmail);
+            $mail->setFrom(config('mail.mailers.smtp.username'), 'healthCare ');
+            $mail->addAddress($offreEmail);
 
-        $mail->isHTML(true);
-        $mail->Subject = 'New Job ' . $user->name;
-        $mail->Body    = "<h3>New Application Received</h3>
+            $mail->isHTML(true);
+            $mail->Subject = 'New Job ' . $user->name;
+            $mail->Body    = "<h3>New Application Received</h3>
                           <p><strong>Applicant Name:</strong> {$user->name}</p>
                           <p><strong>Email:</strong> {$user->email}</p>
                           <p><strong>CV Content:</strong> {$cvContent}</p>";
 
-        $mail->send();
-    } catch (Exception $e) {
-        dd('Email could not be sent. Mailer Error: ');    }
-}
+            $mail->send();
+        } catch (Exception $e) {
+            dd('Email could not be sent. Mailer Error: ');
+        }
+    }
 
 
 

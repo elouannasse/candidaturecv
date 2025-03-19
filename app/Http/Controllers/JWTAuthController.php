@@ -29,7 +29,7 @@ class JWTAuthController extends Controller
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => bcrypt($request->get('password')),
-            'role_id' => $request->get('role_id'), 
+            'role_id' => $request->get('role_id'),
         ]);
 
         $token = JWTAuth::fromUser($user);

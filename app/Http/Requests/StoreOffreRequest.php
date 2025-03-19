@@ -27,8 +27,8 @@ class StoreOffreRequest extends FormRequest
         return [
 
             'title' => 'required|string|unique:offres,title',
-            'lieu'=>'required',
-            'content'=>'required',
+            'lieu' => 'required',
+            'content' => 'required',
 
         ];
     }
@@ -40,5 +40,4 @@ class StoreOffreRequest extends FormRequest
             'data'      => $validator->errors()
         ]));
     }
-
 }

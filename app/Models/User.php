@@ -50,24 +50,40 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    //candidatures
     public function offres()
     {
         return $this->belongsToMany(Offre::class, 'user_offre');
     }
+
+    public function offresCrees(){
+        return $this->hasMany(Offre::class,'recruter_id');
+    }
+
+    public function role()
+    {
+        return   $this->belongsTo(Role::class);
+    }
+
+    public function competences()
+    {
+        return $this->belongsToMany(Competence::class, 'competence_user')
+                    ->withTimestamps();
+    }
+
+
+
+
 
     public function getJWTIdentifier()
     {
         return $this->getKey();
     }
 
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
         return [];
     }
 
 
-    public function role()
-    {
-        return   $this->belongsTo(Role::class);
-    }
 }
