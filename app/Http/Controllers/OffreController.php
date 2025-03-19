@@ -115,12 +115,26 @@ class OffreController extends Controller
     public function apply(Request $request, $offre_id)
     {
 
+
+
         $request->validate([
             'cv' => 'required'
         ]);
 
+
+        $offre = $this->offreRepositoryInterface->getById($offre_id);
+        $this->authorize('apply',$offre );
+
         $user = auth()->user();
-        $offre = Offre::findOrFail($offre_id);
+
+
+        if ($user->offres()->where('offre_id', $offre_id)->exists()) {
+            return response()->json([
+                'message' => ' deja postule a cette offre',
+            ], 422);
+        }
+
+        // $offre = Offre::findOrFail($offre_id);
 
 
         $user->offres()->attach($offre_id, ['cv' => $request->cv]);

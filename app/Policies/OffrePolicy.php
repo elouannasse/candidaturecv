@@ -37,7 +37,8 @@ class OffrePolicy
      */
     public function update(User $user, Offre $offre): bool
     {
-        return $user->role_id === 2; // recruteur
+        // return $user->role_id === 2; // recruteur
+        return ($user->role_id === 2 && $user->id === $offre->recruter_id)||$user->role_id===3;  //admin and recruteur
     }
 
     /**
@@ -45,7 +46,15 @@ class OffrePolicy
      */
     public function delete(User $user, Offre $offre): bool
     {
-        return $user->role_id === 2; // recruteur 
+        return ($user->role_id === 2 && $user->id===$offre->recruter_id) || $user->role_id===3 ; // recruteur
+    }
+
+
+    public function apply(User $user, Offre $offre){
+
+        return $user->role_id===1;
+        // return $user->role_id === 1 && !$user->offres()->where('offre_id', $offre->id)->exists();
+
     }
 
     /**

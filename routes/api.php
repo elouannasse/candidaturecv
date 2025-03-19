@@ -32,14 +32,13 @@ Route::post('login', [JWTAuthController::class, 'login']);
 Route::middleware([JwtMiddleware::class])->group(function () {
     Route::get('user', [JWTAuthController::class, 'getUser']);
     Route::post('logout', [JWTAuthController::class, 'logout']);
+    Route::post('/offres/{offre_id}/apply', [OffreController::class, 'apply']);
 });
 
 // JWT ------------------------------------
 
-Route::middleware(JwtMiddleware::class)->group(function(){
+Route::middleware(JwtMiddleware::class)->group(function () {
     Route::apiResource('/offres', OffreController::class);
-
 });
 
-Route::post('/offres/{offre_id}/apply', [OffreController::class, 'apply']);
 Route::get('/user/applications', [UserController::class, 'userApplications']);
