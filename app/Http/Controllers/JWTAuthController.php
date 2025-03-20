@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 
 class JWTAuthController extends Controller
 {
+    use AuthorizesRequests;
+
 
     public function register(Request $request)
     {
@@ -67,6 +72,59 @@ class JWTAuthController extends Controller
 
         return response()->json(compact('user'));
     }
+
+
+
+    public function updateProfile(Request $request)
+    {
+        try {
+            if (! $user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User not found'
+                ], 404);
+            }
+
+
+            $validateUser = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
+                'password' => 'required|string|max:255',
+            ]);
+
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validateUser->errors()
+                ], 400);
+            }
+
+            if ($request->has('name')) {
+                $user->name = $request->name;
+            }
+            if ($request->has('email')) {
+                $user->email = $request->email;
+            }
+            if ($request->has('password')) {
+                $user->password = bcrypt($request->password);
+            }
+
+            $user->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'profile updated successfully',
+                'user' => $user
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
 
     public function logout()
     {

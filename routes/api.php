@@ -32,6 +32,7 @@ Route::post('login', [JWTAuthController::class, 'login']);
 Route::middleware([JwtMiddleware::class])->group(function () {
     Route::get('user', [JWTAuthController::class, 'getUser']);
     Route::post('logout', [JWTAuthController::class, 'logout']);
+    Route::post('updateProfile', [JWTAuthController::class, 'updateProfile']);
     Route::post('/offres/{offre_id}/apply', [OffreController::class, 'apply']);
 });
 
