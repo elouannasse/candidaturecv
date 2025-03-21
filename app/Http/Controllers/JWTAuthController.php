@@ -59,6 +59,35 @@ class JWTAuthController extends Controller
     }
 
 
+    public function refresh()
+    {
+        try {
+            $currentToken = JWTAuth::getToken();
+
+            if (!$currentToken) {
+                return response()->json(['error' => 'token not provided'], 401);
+            }
+
+            $token = JWTAuth::refresh($currentToken);
+
+            $user = Auth::user();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'token succefully refreshed',
+                'token' => $token,
+                'user' => $user
+            ]);
+        } catch (JWTException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Could not refresh token',
+                'error' => $e->getMessage()
+            ], 401);
+        }
+    }
+
+
 
     public function getUser()
     {
@@ -69,11 +98,8 @@ class JWTAuthController extends Controller
         } catch (JWTException $e) {
             return response()->json(['error' => 'Invalid token'], 400);
         }
-
         return response()->json(compact('user'));
     }
-
-
 
     public function updateProfile(Request $request)
     {
