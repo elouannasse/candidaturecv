@@ -24,6 +24,9 @@ class JWTAuthController extends Controller
             'email' => 'required|string|max:255|email|unique:users',
             'password' => 'required|string|max:255',
             'role_id' => 'required|integer|exists:roles,id',
+            'competence_ids' => 'nullable|array',
+            'competence_ids.*' => 'exists:competences,id'
+
         ]);
 
         if ($validator->fails()) {
@@ -37,7 +40,15 @@ class JWTAuthController extends Controller
             'role_id' => $request->get('role_id'),
         ]);
 
+        if ($request->has('competence_ids') && !empty($request->competence_ids)) {
+
+            $user->competences()->attach($request->competence_ids);
+        }
+
         $token = JWTAuth::fromUser($user);
+
+        $user->load('competences');
+
 
         return response()->json(compact('user', 'token'), 201);
     }
@@ -116,6 +127,8 @@ class JWTAuthController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
                 'password' => 'required|string|max:255',
+                'competence_ids' => 'nullable|array',
+                'competence_ids.*' => 'exists:competences,id'
             ]);
 
             if ($validateUser->fails()) {
@@ -137,6 +150,12 @@ class JWTAuthController extends Controller
             }
 
             $user->save();
+
+            if ($request->has('competence_ids')) {
+                $user->competences()->sync($request->competence_ids);
+            }
+
+            $user->load('competences');
 
             return response()->json([
                 'status' => true,

@@ -5,15 +5,37 @@ namespace App\Http\Controllers;
 use App\Models\Competence;
 use App\Http\Requests\StoreCompetenceRequest;
 use App\Http\Requests\UpdateCompetenceRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CompetenceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
+
+
     public function index()
     {
-        //
+        $competences = Competence::all();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'available competence retrieved succefully',
+            'data' => $competences
+        ]);
+    }
+
+
+    public function getUserCompetence(){
+        $user=Auth::user();
+        $competences=$user->competences;
+
+        return response()->json([
+            'status'=>true,
+            'message'=>'get user competences success',
+            'data'=>$competences
+        ]);
     }
 
     /**
