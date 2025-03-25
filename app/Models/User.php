@@ -27,6 +27,11 @@ class User extends Authenticatable implements JWTSubject
         'role_id'
     ];
 
+    protected $dates = [
+        'created_at',
+        'updated_at',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *

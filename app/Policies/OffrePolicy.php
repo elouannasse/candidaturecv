@@ -21,7 +21,8 @@ class OffrePolicy
      */
     public function view(User $user, Offre $offre): bool
     {
-        return false;
+        return ($user->role_id === 2 && $user->id === $offre->recruter_id) || $user->role_id === 3;  //admin and recruteur
+
     }
 
     /**
@@ -46,7 +47,7 @@ class OffrePolicy
      */
     public function delete(User $user, Offre $offre): bool
     {
-        return ($user->role_id === 2 && $user->id === $offre->recruter_id) || $user->role_id === 3; // recruteur
+        return ($user->role_id === 2 && $user->id === $offre->recruter_id) || $user->role_id === 3; // recruteur et admin
     }
 
 

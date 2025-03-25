@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\CompetenceController;
 use App\Http\Controllers\JWTAuthController;
 use App\Http\Controllers\OffreController;
 use App\Http\Middleware\JwtMiddleware;
@@ -35,6 +36,9 @@ Route::middleware([JwtMiddleware::class])->group(function () {
     Route::post('updateProfile', [JWTAuthController::class, 'updateProfile']);
     Route::post('/offres/{offre_id}/apply', [OffreController::class, 'apply']);
     Route::post('refresh', [JWTAuthController::class, 'refresh']);
+    Route::get('/user/competences', [CompetenceController::class, 'getUserCompetences']);
+
+    Route::get('/offres/usersapplication',[OffreController::class,'usersapplication']);
 });
 
 // JWT ------------------------------------
@@ -44,3 +48,11 @@ Route::middleware(JwtMiddleware::class)->group(function () {
 });
 
 Route::get('/user/applications', [UserController::class, 'userApplications']);
+
+
+Route::get('/userss/offrescontientUser/{offre_id}', [OffreController::class, 'offrescontientUser']);
+
+
+Route::get('export-excel', [OffreController::class, 'export_excel']);
+
+Route::get('/export_applications', [OffreController::class, 'export_applications']);

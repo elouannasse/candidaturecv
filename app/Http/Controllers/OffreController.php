@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponseClass;
+use App\Exports\ExportApplication;
+use App\Exports\ExportUser;
 use App\Models\Offre;
 use App\Http\Requests\StoreOffreRequest;
 use App\Http\Requests\UpdateOffreRequest;
 use App\Http\Resources\OffreResource;
 use App\Interfaces\OffreRepositoryInterface;
+use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +20,7 @@ use Illuminate\Validation\ValidationException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Maatwebsite\Excel\Excel;
 
 class OffreController extends Controller
 {
@@ -48,7 +52,7 @@ class OffreController extends Controller
             'lieu' => $request->lieu,
             'content' => $request->content,
             'email' => $request->email,
-            'recruter_id'=>Auth::id()
+            'recruter_id' => Auth::id()
 
         ];
 
@@ -65,9 +69,13 @@ class OffreController extends Controller
 
     public function show($id)
     {
+        $offre=$this->offreRepositoryInterface->getById($id);
+        $this->authorize('view', $offre);
+
+
         $product = $this->offreRepositoryInterface->getById($id);
 
-        return ApiResponseClass::sendResponse(new OffreResource($product), '', 200);
+        return ApiResponseClass::sendResponse(new OffreResource($product), 'the offre is retrieved with success', 200);
     }
 
 
@@ -123,7 +131,7 @@ class OffreController extends Controller
 
 
         $offre = $this->offreRepositoryInterface->getById($offre_id);
-        $this->authorize('apply',$offre );
+        $this->authorize('apply', $offre);
 
         $user = auth()->user();
 
@@ -183,6 +191,81 @@ class OffreController extends Controller
         }
     }
 
+
+    public function usersapplication()
+    {
+        $user = Auth::user();
+
+        $application = $user->offres()->get();
+        return response()->json($application);
+    }
+
+
+
+    public function offrescontientUser($offre_id)
+    {
+
+        $offre = Offre::find($offre_id);
+        $userss = $offre->users()->get();
+        return response()->json($userss);
+    }
+    public function export_excel()
+    {
+        try {
+            $fileName = 'users_' . time() . '.xlsx';
+            $filePath = 'exports/' . $fileName;
+
+            // Store the file in the public disk
+            app('excel')->store(new ExportUser, $filePath, 'public');
+
+            // Generate download URL
+            $downloadUrl = url('storage/' . $filePath);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Export generated successfully',
+                'file_name' => $fileName,
+                'download_url' => $downloadUrl,
+                'user_count' => \App\Models\User::count()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Export error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+    public function export_applications()
+{
+    try {
+        $fileName = 'applications_' . time() . '.xlsx';
+        $filePath = 'exports/' . $fileName;
+
+        // Store the file in the public disk
+        app('excel')->store(new ExportApplication, $filePath, 'public');
+
+        // Generate download URL
+        $downloadUrl = url('storage/' . $filePath);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Export generated successfully',
+            'file_name' => $fileName,
+            'download_url' => $downloadUrl,
+            'applications_count' => \DB::table('user_offre')->count()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Export error: ' . $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
+    }
+}
 
 
     /**

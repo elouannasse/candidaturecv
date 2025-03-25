@@ -27,14 +27,16 @@ class CompetenceController extends Controller
     }
 
 
-    public function getUserCompetence(){
-        $user=Auth::user();
-        $competences=$user->competences;
+    public function getUserCompetences()
+    {
+        $user = Auth::user();
+        $competences = $user->competences;
+
 
         return response()->json([
-            'status'=>true,
-            'message'=>'get user competences success',
-            'data'=>$competences
+            'status' => true,
+            'message' => 'get user competences success',
+            'data' => $competences
         ]);
     }
 
