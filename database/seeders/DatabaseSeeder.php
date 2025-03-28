@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +13,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Créer d'abord les rôles
+        DB::table('roles')->insert([
+            ['name' => 'Admin', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Recruteur', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Candidat', 'created_at' => now(), 'updated_at' => now()],
+        ]);
 
+        // Ensuite créer l'utilisateur avec un rôle spécifique
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'role_id' => 1, // Admin
         ]);
     }
 }

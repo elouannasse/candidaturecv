@@ -14,7 +14,31 @@ class CompetenceController extends Controller
      */
 
 
-
+         /**
+ * @OA\Get(
+ *     path="/api/competences",
+ *     summary="Lister toutes les compétences disponibles",
+ *     tags={"Compétences"},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Liste des compétences récupérée avec succès",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean"),
+ *             @OA\Property(property="message", type="string"),
+ *             @OA\Property(
+ *                 property="data", 
+ *                 type="array", 
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="name", type="string"),
+ *                     @OA\Property(property="created_at", type="string", format="date-time"),
+ *                     @OA\Property(property="updated_at", type="string", format="date-time")
+ *                 )
+ *             )
+ *         )
+ *     )
+ * )
+ */
     public function index()
     {
         $competences = Competence::all();
@@ -25,6 +49,35 @@ class CompetenceController extends Controller
             'data' => $competences
         ]);
     }
+
+
+    /**
+ * @OA\Get(
+ *     path="/api/user/competences",
+ *     summary="Obtenir les compétences de l'utilisateur connecté",
+ *     tags={"Compétences"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Compétences de l'utilisateur récupérées avec succès",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean"),
+ *             @OA\Property(property="message", type="string"),
+ *             @OA\Property(
+ *                 property="data", 
+ *                 type="array", 
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer"),
+ *                     @OA\Property(property="name", type="string"),
+ *                     @OA\Property(property="created_at", type="string", format="date-time"),
+ *                     @OA\Property(property="updated_at", type="string", format="date-time"),
+ *                     @OA\Property(property="pivot", type="object")
+ *                 )
+ *             )
+ *         )
+ *     )
+ * )
+ */
 
 
     public function getUserCompetences()

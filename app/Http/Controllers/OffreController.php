@@ -35,13 +35,48 @@ class OffreController extends Controller
 
         $this->offreRepositoryInterface = $offreRepositoryInterface;
     }
-
+  /**
+ * @OA\Get(
+ *     path="/api/offres",
+ *     summary="Lister toutes les offres d'emploi",
+ *     tags={"Offres"},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Liste des offres récupérée avec succès",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Offre"))
+ *         )
+ *     )
+ * )
+ */
     public function index()
     {
 
         $data = $this->offreRepositoryInterface->index();
         return ApiResponseClass::sendResponse(OffreResource::collection($data), '', 200);
     }
+    // * @OA\Post(
+    //     *     path="/api/offres",
+    //     *     summary="Créer une nouvelle offre d'emploi",
+    //     *     tags={"Offres"},
+    //     *     security={{"bearerAuth":{}}},
+    //     *     @OA\RequestBody(
+    //     *         required=true,
+    //     *         @OA\JsonContent(
+    //     *             required={"title", "lieu", "content", "email"},
+    //     *             @OA\Property(property="title", type="string", example="Développeur Laravel"),
+    //     *             @OA\Property(property="lieu", type="string", example="Casablanca"),
+    //     *             @OA\Property(property="content", type="string", example="Nous recherchons un développeur Laravel expérimenté..."),
+    //     *             @OA\Property(property="email", type="string", format="email", example="contact@entreprise.com")
+    //     *         )
+    //     *     ),
+    //     *     @OA\Response(
+    //     *         response=201,
+    //     *         description="Offre créée avec succès",
+    //     *         @OA\JsonContent(ref="#/components/schemas/Offre")
+    //     *     ),
+    //     *     @OA\Response(response=403, description="Non autorisé")
+    //     * )
 
     public function store(StoreOffreRequest $request)
     {
@@ -66,6 +101,26 @@ class OffreController extends Controller
         }
     }
 
+    // * @OA\Get(
+    //     *     path="/api/offres/{id}",
+    //     *     summary="Obtenir les détails d'une offre",
+    //     *     tags={"Offres"},
+    //     *     @OA\Parameter(
+    //     *         name="id",
+    //     *         in="path",
+    //     *         required=true,
+    //     *         description="ID de l'offre",
+    //     *         @OA\Schema(type="integer")
+    //     *     ),
+    //     *     @OA\Response(
+    //     *         response=200,
+    //     *         description="Détails de l'offre récupérés avec succès",
+    //     *         @OA\JsonContent(ref="#/components/schemas/Offre")
+    //     *     ),
+    //     *     @OA\Response(response=403, description="Non autorisé"),
+    //     *     @OA\Response(response=404, description="Offre non trouvée")
+    //     * )
+
 
     public function show($id)
     {
@@ -77,6 +132,37 @@ class OffreController extends Controller
 
         return ApiResponseClass::sendResponse(new OffreResource($product), 'the offre is retrieved with success', 200);
     }
+
+
+    // * @OA\Put(
+    //     *     path="/api/offres/{id}",
+    //     *     summary="Mettre à jour une offre",
+    //     *     tags={"Offres"},
+    //     *     security={{"bearerAuth":{}}},
+    //     *     @OA\Parameter(
+    //     *         name="id",
+    //     *         in="path",
+    //     *         required=true,
+    //     *         description="ID de l'offre",
+    //     *         @OA\Schema(type="integer")
+    //     *     ),
+    //     *     @OA\RequestBody(
+    //     *         required=true,
+    //     *         @OA\JsonContent(
+    //     *             @OA\Property(property="title", type="string", example="Développeur Laravel Senior"),
+    //     *             @OA\Property(property="lieu", type="string", example="Rabat"),
+    //     *             @OA\Property(property="content", type="string", example="Mise à jour: Nous recherchons un développeur Laravel senior..."),
+    //     *             @OA\Property(property="email", type="string", format="email", example="rh@entreprise.com")
+    //     *         )
+    //     *     ),
+    //     *     @OA\Response(
+    //     *         response=200,
+    //     *         description="Offre mise à jour avec succès",
+    //     *         @OA\JsonContent(ref="#/components/schemas/Offre")
+    //     *     ),
+    //     *     @OA\Response(response=403, description="Non autorisé"),
+    //     *     @OA\Response(response=404, description="Offre non trouvée")
+    //     * )
 
 
     public function update(UpdateOffreRequest $request, $id)
@@ -102,6 +188,29 @@ class OffreController extends Controller
             return ApiResponseClass::rollback($th);
         }
     }
+
+      
+/**
+ * @OA\Delete(
+ *     path="/api/offres/{id}",
+ *     summary="Supprimer une offre",
+ *     tags={"Offres"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID de l'offre",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Offre supprimée avec succès"
+ *     ),
+ *     @OA\Response(response=403, description="Non autorisé"),
+ *     @OA\Response(response=404, description="Offre non trouvée")
+ * )
+ */
 
 
     public function destroy($id)
@@ -190,6 +299,8 @@ class OffreController extends Controller
             dd('Email could not be sent. Mailer Error: ');
         }
     }
+    
+    
 
 
     public function usersapplication()
@@ -199,6 +310,32 @@ class OffreController extends Controller
         $application = $user->offres()->get();
         return response()->json($application);
     }
+
+
+
+    /**
+ * @OA\Get(
+ *     path="/api/offres/{offre_id}/candidates",
+ *     summary="Obtenir les candidats pour une offre spécifique",
+ *     tags={"Recrutement"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(
+ *         name="offre_id",
+ *         in="path",
+ *         required=true,
+ *         description="ID de l'offre",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Liste des candidats récupérée avec succès",
+ *         @OA\JsonContent(
+ *             type="array",
+ *             @OA\Items(type="object")
+ *         )
+ *     )
+ * )
+ */
 
 
 
@@ -237,7 +374,41 @@ class OffreController extends Controller
     }
 
 
+/**
+ * @OA\Schema(
+ *     schema="Offre",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="title", type="string", example="Développeur Laravel"),
+ *     @OA\Property(property="lieu", type="string", example="Casablanca"),
+ *     @OA\Property(property="content", type="string", example="Description détaillée du poste..."),
+ *     @OA\Property(property="email", type="string", format="email", example="contact@entreprise.com"),
+ *     @OA\Property(property="recruter_id", type="integer", example=2),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ */
 
+/**
+ * @OA\Schema(
+ *     schema="User",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+ *     @OA\Property(property="role_id", type="integer", example=3),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ */
+
+/**
+ * @OA\Schema(
+ *     schema="Competence",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="PHP"),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ */
     public function export_applications()
 {
     try {

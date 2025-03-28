@@ -11,9 +11,52 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 
+
+
+
+
+
+
 class JWTAuthController extends Controller
 {
     use AuthorizesRequests;
+
+
+
+
+
+
+
+
+
+
+ /**
+ * @OA\Post(
+ *     path="/api/register",
+ *     summary="Enregistrer un nouvel utilisateur",
+ *     tags={"Authentification"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"name", "email", "password", "role_id"},
+ *             @OA\Property(property="name", type="string", example="John Doe"),
+ *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+ *             @OA\Property(property="password", type="string", example="password123"),
+ *             @OA\Property(property="role_id", type="integer", example=3),
+ *             @OA\Property(property="competence_ids", type="array", @OA\Items(type="integer"), example={1, 2})
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Utilisateur créé avec succès",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="user", type="object"),
+ *             @OA\Property(property="token", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(response=400, description="Erreur de validation")
+ * )
+ */
 
 
     public function register(Request $request)
